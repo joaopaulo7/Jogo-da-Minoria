@@ -23,8 +23,9 @@
 #  
 from __future__ import absolute_import, division, print_function, unicode_literals
 import tensorflow as tf
+import numpy as np
 from Perceptron import Perceptron
-import random, math
+import random, math, os
         
 class Jogador:
     
@@ -40,7 +41,8 @@ class Jogador:
             if self.tipoRede == 'simples':
                 self.saida = round(self.rede.ativar(inputs))
             else:
-                self.saida = round(float(self.rede.predict((inputs,))[0]))
+                print(self.rede.predict(np.array([inputs, ]))[0][0])
+                self.saida = round(float(self.rede.predict(np.array([inputs, ]))[0][0]))
         else:
             self.saida =  random.randint(0, 1)
         return self.saida
@@ -49,12 +51,14 @@ class Jogador:
         if self.rede and self.tipoRede == 'simples' :
             self.rede.treinar(correto - self.saida, inputs)
         elif self.rede:
-            self.rede.fit( x = (inputs, ), y = ((correto,), ), batch_size = 1, epochs=1)
+            print(((correto,), ))
+            correto *= 0.99999
+            self.rede.fit( x = np.array([inputs, ]), y = np.array([correto, ]), batch_size = 1, epochs=1,  verbose = 0)
 
     def addVitorias(self, num = 1):
         self.vitorias += num
         
-memoria = 0, 0, 0
+memoria = np.array( [0, 0, 0])
 jogadores = []
 
 for i in range(50):
@@ -64,7 +68,7 @@ for i in range(50):
     
 for i in range(50):
     nome = "PerceptronSimples-" + str(i)
-    p = Perceptron(numInputs = 3, taxaAprendizado = 0.1)
+    p = Perceptron(numInputs = 3, taxaAprendizado = 5)
     jogador = Jogador(nome, p)
     jogadores.append(jogador)
     
@@ -73,13 +77,15 @@ k= tf.keras.Sequential([
     tf.keras.layers.Dense(1, activation='sigmoid')
 ])
 
-k.compile(optimizer='adam',
-              loss='sparse_categorical_crossentropy',
+k.compile(optimizer='Adam',
+              loss='mean_squared_error',
               metrics=['accuracy'])
 
 jogadores.append( Jogador("RedeDupla-0", k, "complexa"))
 
-for i in range(100):
+r= 500
+
+for i in range(r):
     soma = 0
     jogadas = []
     
@@ -88,20 +94,20 @@ for i in range(100):
         jogadas.append( jogada)
         soma += jogada
         
-    minoria = (round(soma/100)*(-1) + 1)*0.999999
+    minoria = (soma/101)*(-1) + 1
     
     for j in range(101):
         if jogadas[j] == round(minoria) :
-            jogadores[j].addVitorias()
+            if i > r - 50 :
+                jogadores[j].addVitorias()
         else:
-            jogadores[j].treinar(minoria, memoria[-3:])
+            jogadores[j].treinar( minoria, memoria[-3:])
             
-    memoria + (minoria,)
+    np.append(memoria, [round(minoria), ])
     
-    
-    print("A MINORIA FOI:" + str(minoria))
-    for i in range(101):
-        print( jogadores[i].nome + "->" + str(jogadas[i]))
+    os.system('clear')
+    print(i)
+
 
 for i in range(101):
     print( jogadores[i].nome + "->" + str(jogadores[i].vitorias) + " Vitorias")
