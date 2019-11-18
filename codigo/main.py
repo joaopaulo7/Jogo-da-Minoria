@@ -68,7 +68,7 @@ for i in range(50):
     
 for i in range(50):
     nome = "PerceptronSimples-" + str(i)
-    p = Perceptron(numInputs = 3, taxaAprendizado = 5)
+    p = Perceptron(numInputs = 3, taxaAprendizado = 0.1)
     jogador = Jogador(nome, p)
     jogadores.append(jogador)
     
@@ -98,10 +98,11 @@ for i in range(r):
     
     for j in range(101):
         if jogadas[j] == round(minoria) :
-            if i > r - 50 :
+            if i > r - 100 :
                 jogadores[j].addVitorias()
         else:
-            jogadores[j].treinar( minoria, memoria[-3:])
+            if i < r - 100 or jogadores[j].tipoRede == "complexa":
+                jogadores[j].treinar( minoria, memoria[-3:])
             
     np.append(memoria, [round(minoria), ])
     
