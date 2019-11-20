@@ -41,7 +41,6 @@ class Jogador:
             if self.tipoRede == 'simples':
                 self.saida = round(self.rede.ativar(inputs))
             else:
-                print(self.rede.predict(np.array([inputs, ]))[0][0])
                 self.saida = round(float(self.rede.predict(np.array([inputs, ]))[0][0]))
         else:
             self.saida =  random.randint(0, 1)
@@ -51,8 +50,6 @@ class Jogador:
         if self.rede and self.tipoRede == 'simples' :
             self.rede.treinar(correto - self.saida, inputs)
         elif self.rede:
-            print(((correto,), ))
-            correto *= 0.99999
             self.rede.fit( x = np.array([inputs, ]), y = np.array([correto, ]), batch_size = 1, epochs=1,  verbose = 0)
 
     def addVitorias(self, num = 1):
@@ -83,7 +80,7 @@ k.compile(optimizer='Adam',
 
 jogadores.append( Jogador("RedeDupla-0", k, "complexa"))
 
-r= 500
+r= 100
 
 for i in range(r):
     soma = 0
@@ -98,10 +95,10 @@ for i in range(r):
     
     for j in range(101):
         if jogadas[j] == round(minoria) :
-            if i > r - 100 :
+            if i > r - 10 :
                 jogadores[j].addVitorias()
         else:
-            if i < r - 100 or jogadores[j].tipoRede == "complexa":
+            if i < r - 10 or jogadores[j].tipoRede == "complexa":
                 jogadores[j].treinar( minoria, memoria[-3:])
             
     np.append(memoria, [round(minoria), ])
