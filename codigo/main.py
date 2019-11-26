@@ -26,7 +26,8 @@ import tensorflow as tf
 import numpy as np
 from Perceptron import Perceptron
 import random, math, os
-        
+from xlwt import Workbook 
+
 class Jogador:
     
     def __init__(self, nome, rede = None, tipoRede = "simples"):
@@ -35,11 +36,13 @@ class Jogador:
         self.saida = 0
         self.vitorias = 0
         self.tipoRede = tipoRede
+        self.resultado = []
         
     def jogar(self, inputs):
         if self.rede:
             if self.tipoRede == 'simples':
-                self.saida = round(self.rede.ativar(inputs))
+                
+                self.saida = round(self.rede.ativar(inputs[-11:]))
             else:
                 self.saida = round(float(self.rede.predict(np.array([inputs, ]))[0][0]))
         else:
@@ -48,29 +51,31 @@ class Jogador:
     
     def treinar(self, correto, inputs):
         if self.rede and self.tipoRede == 'simples' :
-            self.rede.treinar(correto - self.saida, inputs)
+            self.rede.treinar(correto - self.saida, inputs[-11:])
         elif self.rede:
             self.rede.fit( x = np.array([inputs, ]), y = np.array([correto, ]), batch_size = 1, epochs=1,  verbose = 0)
+        self.resultado.append(self.vitorias)
 
-    def addVitorias(self, num = 1):
+    def addVitorias(self, i, num = 1):
         self.vitorias += num
+        self.resultado.append(self.vitorias)
         
-memoria = np.array( [0, 0, 0])
+memoria = np.array( [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 jogadores = []
 
-for i in range(50):
+for i in range(0):
     nome = "Aleatorio-" + str(i)
     jogador = Jogador(nome)
     jogadores.append(jogador)
     
-for i in range(50):
+for i in range(100):
     nome = "PerceptronSimples-" + str(i)
-    p = Perceptron(numInputs = 3, taxaAprendizado = 0.1)
+    p = Perceptron(numInputs = 11, taxaAprendizado = .001)
     jogador = Jogador(nome, p)
     jogadores.append(jogador)
     
 k= tf.keras.Sequential([
-    tf.keras.layers.Dense(1, activation='relu', input_shape=(3,)),
+    tf.keras.layers.Dense(1, activation='relu', input_shape=(12,)),
     tf.keras.layers.Dense(1, activation='sigmoid')
 ])
 
@@ -80,28 +85,26 @@ k.compile(optimizer='Adam',
 
 jogadores.append( Jogador("RedeDupla-0", k, "complexa"))
 
-r= 100
+r= 6000
 
 for i in range(r):
     soma = 0
     jogadas = []
     
     for j in range(101):
-        jogada = jogadores[j].jogar(memoria[-3:])
+        jogada = jogadores[j].jogar(memoria[-12:])
         jogadas.append( jogada)
         soma += jogada
         
-    minoria = (soma/101)*(-1) + 1
+    minoria = round(soma/101)*(-1) + 1
     
     for j in range(101):
-        if jogadas[j] == round(minoria) :
-            if i > r - 10 :
-                jogadores[j].addVitorias()
+        if jogadas[j] == minoria :
+            jogadores[j].addVitorias(i)
         else:
-            if i < r - 10 or jogadores[j].tipoRede == "complexa":
-                jogadores[j].treinar( minoria, memoria[-3:])
+            jogadores[j].treinar( minoria, memoria[-12:])
             
-    np.append(memoria, [round(minoria), ])
+    np.append(memoria, [minoria, ])
     
     os.system('clear')
     print(i)
@@ -110,3 +113,10 @@ for i in range(r):
 for i in range(101):
     print( jogadores[i].nome + "->" + str(jogadores[i].vitorias) + " Vitorias")
 
+wb = Workbook() 
+sheet1 = wb.add_sheet('6x10e+3-001') 
+for i in range(101):
+    sheet1.write(0, i, jogadores[i].nome) 
+    for j in range(0, r):
+        sheet1.write(j+1, i, jogadores[i].resultado[j]/(j+1)) 
+wb.save('xlwt example.xls')
