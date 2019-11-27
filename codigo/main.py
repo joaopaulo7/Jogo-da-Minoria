@@ -36,13 +36,11 @@ class Jogador:
         self.saida = 0
         self.vitorias = 0
         self.tipoRede = tipoRede
-        self.resultado = []
         
     def jogar(self, inputs):
         if self.rede:
             if self.tipoRede == 'simples':
-                
-                self.saida = round(self.rede.ativar(inputs[-11:]))
+                self.saida = round(self.rede.ativar(inputs))
             else:
                 self.saida = round(float(self.rede.predict(np.array([inputs, ]))[0][0]))
         else:
@@ -51,14 +49,12 @@ class Jogador:
     
     def treinar(self, correto, inputs):
         if self.rede and self.tipoRede == 'simples' :
-            self.rede.treinar(correto - self.saida, inputs[-11:])
+            self.rede.treinar(correto - self.saida, inputs)
         elif self.rede:
             self.rede.fit( x = np.array([inputs, ]), y = np.array([correto, ]), batch_size = 1, epochs=1,  verbose = 0)
-        self.resultado.append(self.vitorias)
 
     def addVitorias(self, i, num = 1):
         self.vitorias += num
-        self.resultado.append(self.vitorias)
         
 memoria = np.array( [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 jogadores = []
@@ -75,7 +71,7 @@ for i in range(100):
     jogadores.append(jogador)
     
 k= tf.keras.Sequential([
-    tf.keras.layers.Dense(1, activation='relu', input_shape=(12,)),
+    tf.keras.layers.Dense(1, activation='relu', input_shape=(11,)),
     tf.keras.layers.Dense(1, activation='sigmoid')
 ])
 
@@ -85,14 +81,19 @@ k.compile(optimizer='Adam',
 
 jogadores.append( Jogador("RedeDupla-0", k, "complexa"))
 
-r= 6000
+r= 1000
+
+wb = Workbook() 
+sheet1 = wb.add_sheet('1x10e+3-001') 
+for i in range(101):
+    sheet1.write(0, i, jogadores[i].nome) 
 
 for i in range(r):
     soma = 0
     jogadas = []
     
     for j in range(101):
-        jogada = jogadores[j].jogar(memoria[-12:])
+        jogada = jogadores[j].jogar(memoria[-11:])
         jogadas.append( jogada)
         soma += jogada
         
@@ -101,9 +102,9 @@ for i in range(r):
     for j in range(101):
         if jogadas[j] == minoria :
             jogadores[j].addVitorias(i)
-        else:
-            jogadores[j].treinar( minoria, memoria[-12:])
-            
+        jogadores[j].treinar( minoria, memoria[-11:])
+        
+        sheet1.write(i+1, j, jogadores[j].vitorias)
     np.append(memoria, [minoria, ])
     
     os.system('clear')
@@ -113,10 +114,4 @@ for i in range(r):
 for i in range(101):
     print( jogadores[i].nome + "->" + str(jogadores[i].vitorias) + " Vitorias")
 
-wb = Workbook() 
-sheet1 = wb.add_sheet('6x10e+3-001') 
-for i in range(101):
-    sheet1.write(0, i, jogadores[i].nome) 
-    for j in range(0, r):
-        sheet1.write(j+1, i, jogadores[i].resultado[j]/(j+1)) 
-wb.save('xlwt example.xls')
+wb.save('teste1000-num.xls')
