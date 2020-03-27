@@ -58,35 +58,22 @@ class Jogador:
         
 memoria = np.array( [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 jogadores = []
-
-for i in range(0):
-    nome = "Aleatorio-" + str(i)
-    jogador = Jogador(nome)
-    jogadores.append(jogador)
     
-for i in range(100):
+for i in range(101):
     nome = "PerceptronSimples-" + str(i)
-    p = Perceptron(numInputs = 11, taxaAprendizado = .001)
+    p = Perceptron(numInputs = 11, taxaAprendizado = .01)
     jogador = Jogador(nome, p)
     jogadores.append(jogador)
-    
-k= tf.keras.Sequential([
-    tf.keras.layers.Dense(1, activation='relu', input_shape=(11,)),
-    tf.keras.layers.Dense(1, activation='sigmoid')
-])
 
-k.compile(optimizer='Adam',
-              loss='mean_squared_error',
-              metrics=['accuracy'])
-
-jogadores.append( Jogador("RedeDupla-0", k, "complexa"))
 
 r= 1000
 
 wb = Workbook() 
 sheet1 = wb.add_sheet('1x10e+3-001') 
-for i in range(101):
-    sheet1.write(0, i, jogadores[i].nome) 
+for i in range(r):
+    sheet1.write(i, 0, "jogada "+str(i)) 
+sheet1.write(0, 1, "Ums")
+sheet1.write(0, 2, "Zeros")
 
 for i in range(r):
     soma = 0
@@ -102,16 +89,14 @@ for i in range(r):
     for j in range(101):
         if jogadas[j] == minoria :
             jogadores[j].addVitorias(i)
-        jogadores[j].treinar( minoria, memoria[-11:])
+        else:
+            jogadores[j].treinar( minoria, memoria[-11:])
         
-        sheet1.write(i+1, j, jogadores[j].vitorias)
+    sheet1.write(i+1, 1, soma)
+    sheet1.write(i+1, 2, 101 - soma)
     np.append(memoria, [minoria, ])
     
     os.system('clear')
     print(i)
-
-
-for i in range(101):
-    print( jogadores[i].nome + "->" + str(jogadores[i].vitorias) + " Vitorias")
 
 wb.save('teste1000-num.xls')
