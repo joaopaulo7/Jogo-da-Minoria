@@ -25,11 +25,11 @@ import random, math
 
 def sigmoid(x):
     if(x < -50):
-        return 0
-    elif(x > 50):
         return 1
+    elif(x > 50):
+        return 0
     else:
-        return 1 / (1 + math.exp(x))
+        return 1 / (1 + math.exp(-x))
 
 class Perceptron:
     
