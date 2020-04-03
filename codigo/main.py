@@ -21,12 +21,65 @@
 #  MA 02110-1301, USA.
 #  
 #  
+
 from __future__ import absolute_import, division, print_function, unicode_literals
+import matplotlib.pyplot as plt 
 import tensorflow as tf
 import numpy as np
 from Perceptron import Perceptron
 import random, math, os
 from xlwt import Workbook 
+
+def plotar(vum, vzero, tam):
+    
+    # line 1 points 
+    v1 = []
+    v2 = []
+    for i in range(tam):
+        if(i%2 == 0):
+            v1.append(vum[i])
+            if(i != 0):
+                v2.append(vum[i-1])
+            else:
+                v2.append(vum[0])
+        else:
+            v2.append(vum[i])
+            v1.append(vum[i-1])
+            
+    # plotting the line 1 points  
+    plt.plot(range(tam), v1, color = "red", label = "") 
+    plt.plot(range(tam), v2, color = "red", label = "uns") 
+    
+    v1.clear()
+    v2.clear()
+    # line 2 points 
+    for i in range(tam):
+        if(i%2 == 0):
+            v1.append(vzero[i])
+            if(i != 0):
+                v2.append(vzero[i-1])
+            else:
+                v2.append(vzero[0])
+        else:
+            v2.append(vzero[i])
+            v1.append(vzero[i-1])
+    # plotting the line 2 points 
+    plt.plot(range(tam), v1, color= "blue", label = "") 
+    plt.plot(range(tam), v2, color= "blue", label = "zeros") 
+      
+    # naming the x axis 
+    plt.xlabel('jogada') 
+    # naming the y axis 
+    plt.ylabel('quantidade') 
+    # giving a title to my graph 
+    plt.title('numero de zeros e uns em cada jogada') 
+      
+    # show a legend on the plot 
+    plt.legend() 
+      
+    # function to show the plot 
+    plt.show() 
+
 
 class Jogador:
     
@@ -61,7 +114,7 @@ jogadores = []
     
 for i in range(101):
     nome = "PerceptronSimples-" + str(i)
-    p = Perceptron(numInputs = 11, taxaAprendizado = .01)
+    p = Perceptron(numInputs = 11, taxaAprendizado = random.random()/10)
     jogador = Jogador(nome, p)
     jogadores.append(jogador)
 
@@ -74,6 +127,9 @@ for i in range(r):
     sheet1.write(i, 0, "jogada "+str(i)) 
 sheet1.write(0, 1, "Ums")
 sheet1.write(0, 2, "Zeros")
+
+vuns = []
+vzeros  = []
 
 for i in range(r):
     soma = 0
@@ -91,7 +147,10 @@ for i in range(r):
             jogadores[j].addVitorias(i)
         else:
             jogadores[j].treinar( minoria, memoria[-11:])
-        
+    
+    vuns.append(soma)
+    vzeros.append(101 - soma)
+    
     sheet1.write(i+1, 1, soma)
     sheet1.write(i+1, 2, 101 - soma)
     np.append(memoria, [minoria, ])
@@ -100,3 +159,4 @@ for i in range(r):
     print(i)
 
 wb.save('teste1000-num.xls')
+plotar(vuns, vzeros, r)
