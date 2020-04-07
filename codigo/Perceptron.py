@@ -36,15 +36,14 @@ class Perceptron:
     def __init__(self, numInputs, taxaAprendizado, bias = None):
     
         self.numInputs = numInputs
-        
         self.taxa = taxaAprendizado
+        self.pesos = []
         
         if bias:
             self.bias = bias
         else:
             self.bias = random.random()*2 - 1
         
-        self.pesos = []
         
         for i in range(numInputs):
             self.pesos.append(random.random()*2 - 1)

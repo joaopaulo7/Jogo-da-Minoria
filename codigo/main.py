@@ -24,139 +24,114 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 import matplotlib.pyplot as plt 
-import tensorflow as tf
 import numpy as np
 from Perceptron import Perceptron
 import random, math, os
 from xlwt import Workbook 
 
-def plotar(vum, vzero, tam):
+def plotar(vum, vzero, tam, eta):
     
-    # line 1 points 
-    v1 = []
-    v2 = []
-    for i in range(tam):
-        if(i%2 == 0):
-            v1.append(vum[i])
-            if(i != 0):
-                v2.append(vum[i-1])
-            else:
-                v2.append(vum[0])
-        else:
-            v2.append(vum[i])
-            v1.append(vum[i-1])
-            
-    # plotting the line 1 points  
-    plt.plot(range(tam), v1, color = "red", label = "") 
-    plt.plot(range(tam), v2, color = "red", label = "uns") 
+    v1=[]
     
-    v1.clear()
-    v2.clear()
-    # line 2 points 
     for i in range(tam):
-        if(i%2 == 0):
-            v1.append(vzero[i])
-            if(i != 0):
-                v2.append(vzero[i-1])
-            else:
-                v2.append(vzero[0])
-        else:
-            v2.append(vzero[i])
-            v1.append(vzero[i-1])
-    # plotting the line 2 points 
-    plt.plot(range(tam), v1, color= "blue", label = "") 
-    plt.plot(range(tam), v2, color= "blue", label = "zeros") 
-      
-    # naming the x axis 
+        v1.append( abs(vum[i] - vzero[i]))
+    plt.plot(range(tam), v1, label = ""+str(eta)+" eta") 
+    
+    
     plt.xlabel('jogada') 
-    # naming the y axis 
-    plt.ylabel('quantidade') 
-    # giving a title to my graph 
-    plt.title('numero de zeros e uns em cada jogada') 
+     
+    plt.ylabel('diferença') 
+    
+    plt.title('diferença entre a quantidade de zeros e uns em cada jogada') 
       
-    # show a legend on the plot 
     plt.legend() 
-      
-    # function to show the plot 
-    plt.show() 
 
 
 class Jogador:
     
-    def __init__(self, nome, rede = None, tipoRede = "simples"):
+    def __init__(self, nome, rede = None):
         self.nome = nome
         self.rede = rede
         self.saida = 0
         self.vitorias = 0
-        self.tipoRede = tipoRede
         
     def jogar(self, inputs):
         if self.rede:
-            if self.tipoRede == 'simples':
-                self.saida = round(self.rede.ativar(inputs))
-            else:
-                self.saida = round(float(self.rede.predict(np.array([inputs, ]))[0][0]))
-        else:
-            self.saida =  random.randint(0, 1)
+            self.saida = round(self.rede.ativar(inputs))
         return self.saida
     
     def treinar(self, correto, inputs):
-        if self.rede and self.tipoRede == 'simples' :
+        if self.rede:
             self.rede.treinar(correto - self.saida, inputs)
-        elif self.rede:
-            self.rede.fit( x = np.array([inputs, ]), y = np.array([correto, ]), batch_size = 1, epochs=1,  verbose = 0)
 
     def addVitorias(self, i, num = 1):
         self.vitorias += num
         
-memoria = np.array( [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-jogadores = []
+def main(args):
     
-for i in range(101):
-    nome = "PerceptronSimples-" + str(i)
-    p = Perceptron(numInputs = 11, taxaAprendizado = random.random()/10)
-    jogador = Jogador(nome, p)
-    jogadores.append(jogador)
-
-
-r= 1000
-
-wb = Workbook() 
-sheet1 = wb.add_sheet('1x10e+3-001') 
-for i in range(r):
-    sheet1.write(i, 0, "jogada "+str(i)) 
-sheet1.write(0, 1, "Ums")
-sheet1.write(0, 2, "Zeros")
-
-vuns = []
-vzeros  = []
-
-for i in range(r):
-    soma = 0
-    jogadas = []
+    numJogadores = 101
+    numJogadas = 1000
     
-    for j in range(101):
-        jogada = jogadores[j].jogar(memoria[-11:])
-        jogadas.append( jogada)
-        soma += jogada
+    memoria = np.array( [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+    jogadores = []
         
-    minoria = round(soma/101)*(-1) + 1
-    
-    for j in range(101):
-        if jogadas[j] == minoria :
-            jogadores[j].addVitorias(i)
-        else:
-            jogadores[j].treinar( minoria, memoria[-11:])
-    
-    vuns.append(soma)
-    vzeros.append(101 - soma)
-    
-    sheet1.write(i+1, 1, soma)
-    sheet1.write(i+1, 2, 101 - soma)
-    np.append(memoria, [minoria, ])
-    
-    os.system('clear')
-    print(i)
+    for i in range(numJogadores):
+        nome = "PerceptronSimples-" + str(i)
+        p = Perceptron(numInputs = 13, taxaAprendizado = args)
+        jogador = Jogador(nome, p)
+        jogadores.append(jogador)
 
-wb.save('teste1000-num.xls')
-plotar(vuns, vzeros, r)
+
+    #Essa parte e usada para escrever a planilha
+    wb = Workbook() 
+    sheet1 = wb.add_sheet('tabela') 
+    for i in range(1, numJogadas+1):
+        sheet1.write(i, 0, "jogada "+str(i)) 
+    sheet1.write(0, 1, "Ums")
+    sheet1.write(0, 2, "Zeros")
+    #[fim] planilha
+
+    vuns = []
+    vzeros  = []
+
+    for i in range(numJogadas):
+        soma = 0
+        jogadas = []
+        
+        for j in range(numJogadores):
+            jogada = jogadores[j].jogar( memoria[-13:])
+            jogadas.append( jogada)
+            soma += jogada
+            
+        minoria = round(soma/numJogadores)*(-1) + 1
+        
+        for j in range(numJogadores):
+            if jogadas[j] == minoria :
+                jogadores[j].addVitorias(i)
+            else:
+                jogadores[j].treinar( minoria, memoria[-13:])
+        
+        vuns.append(soma)
+        vzeros.append(numJogadores - soma)
+        
+        #Usado para planilha
+        sheet1.write(i+1, 1, soma)
+        sheet1.write(i+1, 2, numJogadores - soma)
+        np.append(memoria, [minoria, ])
+        #[fim] planilha
+        
+        os.system('clear')
+        print(minoria)
+        print(i)
+    
+    
+    #salva a planilha
+    wb.save('resultados/1000 - 101jogadores - 13inpts - '+str(args)+'eta.ods')
+    
+    #plota e salva o grafico
+    plotar(vuns, vzeros,numJogadas, args)
+
+
+for i in range (6):
+    main(round(1/math.pow((i*4 + 0.8), 2), 3))
+    plt.savefig('../gráfico - Zeros e Uns - variaçao de eta- 01.png') 
