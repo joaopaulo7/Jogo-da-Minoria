@@ -70,7 +70,7 @@ class Jogador:
 def main(args):
     
     numJogadores = 101
-    numJogadas = 1000
+    numJogadas = 10000
     
     memoria =  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     jogadores = []
@@ -105,7 +105,7 @@ def main(args):
             jogadas.append( jogada)
             soma += jogada
             
-        minoria = np.sign(soma)
+        minoria = -np.sign(soma)
         
         for j in range(numJogadores):
             if jogadas[j] == minoria :
@@ -133,7 +133,7 @@ def main(args):
         #print(i)
     
     #salva a planilha
-    wb.save('resultados/1000 - 101jogadores - 13inpts - '+str(args)+'eta.ods')
+    wb.save('resultados/'+str(numJogadas)+' - 101jogadores - 13inpts - '+str(args)+'eta.ods')
     
     #plota e salva o grafico
     plotar(vuns, vzeros,numJogadas, args)
@@ -142,4 +142,4 @@ def main(args):
 
 for i in range (6):
     main(round(1/math.pow((i*4 + 0.8), 2), 3))
-    plt.savefig('../Gráficos/gráfico - Zeros e Uns - variaçao de eta- 01.png') 
+    plt.savefig('../Gráficos/gráfico - Zeros e Uns - variaçao de eta- 02.png') 
