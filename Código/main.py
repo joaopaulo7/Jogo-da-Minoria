@@ -72,7 +72,7 @@ def main(args):
     numJogadores = 101
     numJogadas = 1000
     
-    memoria = np.array( [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+    memoria =  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     jogadores = []
         
     for i in range(numJogadores):
@@ -87,8 +87,10 @@ def main(args):
     sheet1 = wb.add_sheet('tabela') 
     for i in range(1, numJogadas+1):
         sheet1.write(i, 0, "jogada "+str(i)) 
-    sheet1.write(0, 1, "Ums")
+    sheet1.write(0, 1, "Uns")
     sheet1.write(0, 2, "Zeros")
+    sheet1.write(0, 3, "Soma")
+    sheet1.write(0, 4, "Diferença")
     #[fim] planilha
 
     vuns = []
@@ -103,7 +105,7 @@ def main(args):
             jogadas.append( jogada)
             soma += jogada
             
-        minoria = round(soma/numJogadores)*(-1) + 1
+        minoria = np.sign(soma)
         
         for j in range(numJogadores):
             if jogadas[j] == minoria :
@@ -111,25 +113,31 @@ def main(args):
             else:
                 jogadores[j].treinar( minoria, memoria[-13:])
         
-        vuns.append(soma)
-        vzeros.append(numJogadores - soma)
+        if(minoria < 0):
+            vuns.append(abs(math.floor(soma/2) - (numJogadores - 1)/2))
+            vzeros.append(abs(math.floor(soma/2) + ((numJogadores - 1)/2) + 1))
+        else:
+            vuns.append(abs(math.ceil(soma/2) - ((numJogadores - 1)/2) - 1))
+            vzeros.append(abs(math.ceil(soma/2) + ((numJogadores - 1)/2)))
         
         #Usado para planilha
-        sheet1.write(i+1, 1, soma)
-        sheet1.write(i+1, 2, numJogadores - soma)
-        np.append(memoria, [minoria, ])
+        sheet1.write(i+1, 1, vuns[i])
+        sheet1.write(i+1, 2, vzeros[i])
+        sheet1.write(i+1, 3, vuns[i] + vzeros[i])
+        sheet1.write(i+1, 4, abs(soma))
+        memoria.append( minoria)
         #[fim] planilha
         
-        os.system('clear')
-        print(minoria)
-        print(i)
-    
+        #os.system('clear')
+        print(memoria[-13:])
+        #print(i)
     
     #salva a planilha
     wb.save('resultados/1000 - 101jogadores - 13inpts - '+str(args)+'eta.ods')
     
     #plota e salva o grafico
     plotar(vuns, vzeros,numJogadas, args)
+
 
 
 for i in range (6):

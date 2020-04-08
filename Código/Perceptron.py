@@ -21,7 +21,7 @@
 #  MA 02110-1301, USA.
 #  
 #  
-import random, math
+import random, math, numpy as np
 
 def sigmoid(x):
     if(x < -50):
@@ -42,11 +42,11 @@ class Perceptron:
         if bias:
             self.bias = bias
         else:
-            self.bias = random.random()*2 - 1
+            self.bias = random.random()*2-1
         
         
         for i in range(numInputs):
-            self.pesos.append(random.random()*2 - 1)
+            self.pesos.append(random.random()*2-1)
         
     def ativar(self, inputs):
         
@@ -54,11 +54,13 @@ class Perceptron:
         for i in range(self.numInputs):
             soma += inputs[i]*self.pesos[i]
         x =  (soma + self.bias)
-        return  sigmoid(x)
+        if(x == 0):
+            return 1
+        return  np.sign(x)
         
     def treinar(self, erro, inputs):
             
         for i in range(self.numInputs):
             self.pesos[i]  =  self.pesos[i] + (self.taxa*erro*inputs[i])
             
-        self.bias = self.bias + self.taxa*erro
+        #self.bias = self.bias + self.taxa*erro
