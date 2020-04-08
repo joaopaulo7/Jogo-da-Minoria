@@ -72,7 +72,7 @@ class Jogador:
 def main(args):
     
     numJogadores = 101
-    numJogadas = 3000
+    numJogadas = 20000
     
     memoria =  [0,0,0,0,0,0,0,0,0,0,0,0,0]
     jogadores = []
@@ -141,7 +141,6 @@ def main(args):
 
 
 
-for i in range (6):
-    main(round(1/math.pow((i + 0.8), 2), 3))
-main(0.00001)
-plt.savefig('../Gráficos/gráfico - Zeros e Uns - variaçao de eta- 03.png') 
+for i in range (3):
+    main(round(1/math.pow((i + 8), 2), 3))
+plt.savefig('../Gráficos/gráfico - Zeros e Uns - variaçao de eta- 03 - 10000.png') 
