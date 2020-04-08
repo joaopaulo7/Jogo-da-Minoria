@@ -24,9 +24,9 @@
 import random, math, numpy as np
 
 def sigmoid(x):
-    if(x < -50):
+    if(x < -10):
         return 1
-    elif(x > 50):
+    elif(x > 10):
         return 0
     else:
         return 1 / (1 + math.exp(-x))
@@ -63,4 +63,4 @@ class Perceptron:
         for i in range(self.numInputs):
             self.pesos[i]  =  self.pesos[i] + (self.taxa*erro*inputs[i])
             
-        #self.bias = self.bias + self.taxa*erro
+        self.bias = self.bias + self.taxa*erro
