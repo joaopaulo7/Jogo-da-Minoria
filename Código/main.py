@@ -57,8 +57,11 @@ class Jogador:
         
     def jogar(self, inputs):
         if self.rede:
-            self.saida = round(self.rede.ativar(inputs))
-        return self.saida
+            self.saida = self.rede.ativar(inputs)
+        print(self.saida)
+        if(self.saida == 0):
+            return 1
+        return np.sign(self.saida)
     
     def treinar(self, correto, inputs):
         if self.rede:
@@ -70,9 +73,9 @@ class Jogador:
 def main(args):
     
     numJogadores = 101
-    numJogadas = 10000
+    numJogadas = 3000
     
-    memoria =  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    memoria =  [0,0,0,0,0,0,0,0,0,0,0,0,0]
     jogadores = []
         
     for i in range(numJogadores):
@@ -111,7 +114,7 @@ def main(args):
             if jogadas[j] == minoria :
                 jogadores[j].addVitorias(i)
             else:
-                jogadores[j].treinar( minoria, memoria[-13:])
+                jogadores[j].treinar( -soma/101, memoria[-13:])
         
         if(minoria < 0):
             vuns.append(abs(math.floor(soma/2) - (numJogadores - 1)/2))
@@ -124,16 +127,14 @@ def main(args):
         sheet1.write(i+1, 1, vuns[i])
         sheet1.write(i+1, 2, vzeros[i])
         sheet1.write(i+1, 3, vuns[i] + vzeros[i])
-        sheet1.write(i+1, 4, abs(soma))
-        memoria.append( minoria)
+        sheet1.write(i+1, 4, int(abs(soma)))
+        memoria.append( -soma/101)
         #[fim] planilha
         
-        #os.system('clear')
-        print(memoria[-13:])
-        #print(i)
+        os.system('clear')
     
     #salva a planilha
-    wb.save('resultados/'+str(numJogadas)+' - 101jogadores - 13inpts - '+str(args)+'eta.ods')
+    wb.save('resultados/'+str(numJogadas)+' - 101jogadores - 13inpts - '+str(args)+'eta - 02.ods')
     
     #plota e salva o grafico
     plotar(vuns, vzeros,numJogadas, args)
@@ -141,5 +142,5 @@ def main(args):
 
 
 for i in range (6):
-    main(round(1/math.pow((i*4 + 0.8), 2), 3))
-    plt.savefig('../Gráficos/gráfico - Zeros e Uns - variaçao de eta- 02.png') 
+    main(round(1/math.pow((i + 0.8), 2), 3))
+    plt.savefig('../Gráficos/gráfico - Zeros e Uns - variaçao de eta- 03.png') 

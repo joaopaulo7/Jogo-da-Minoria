@@ -30,7 +30,16 @@ def sigmoid(x):
         return 0
     else:
         return 1 / (1 + math.exp(-x))
-
+        
+def tanhOp(x):
+    if(x < -10):
+        return 1
+    elif(x > 10):
+        return 0
+    else:
+        return math.tanh(x)
+        
+        
 class Perceptron:
     
     def __init__(self, numInputs, taxaAprendizado, bias = None):
@@ -56,7 +65,7 @@ class Perceptron:
         x =  (soma + self.bias)
         if(x == 0):
             return 1
-        return  np.sign(x)
+        return  tanhOp(x)#np.sign(x)
         
     def treinar(self, erro, inputs):
             
