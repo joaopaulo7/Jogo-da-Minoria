@@ -58,14 +58,13 @@ class Jogador:
     def jogar(self, inputs):
         if self.rede:
             self.saida = self.rede.ativar(inputs)
-        print(self.saida)
         if(self.saida == 0):
             return 1
         return np.sign(self.saida)
     
     def treinar(self, correto, inputs):
         if self.rede:
-            self.rede.treinar(correto - self.saida, inputs)
+            self.rede.treinar( correto - self.saida, inputs)
 
     def addVitorias(self, i, num = 1):
         self.vitorias += num
@@ -128,8 +127,9 @@ def main(args):
         sheet1.write(i+1, 2, vzeros[i])
         sheet1.write(i+1, 3, vuns[i] + vzeros[i])
         sheet1.write(i+1, 4, int(abs(soma)))
-        memoria.append( -soma/101)
         #[fim] planilha
+        
+        memoria.append( -soma/101)
         
         os.system('clear')
     
@@ -143,4 +143,5 @@ def main(args):
 
 for i in range (6):
     main(round(1/math.pow((i + 0.8), 2), 3))
-    plt.savefig('../Gráficos/gráfico - Zeros e Uns - variaçao de eta- 03.png') 
+main(0.00001)
+plt.savefig('../Gráficos/gráfico - Zeros e Uns - variaçao de eta- 03.png') 

@@ -71,5 +71,6 @@ class Perceptron:
             
         for i in range(self.numInputs):
             self.pesos[i]  =  self.pesos[i] + (self.taxa*erro*inputs[i])
+            print((self.taxa*erro*inputs[i]))
             
         self.bias = self.bias + self.taxa*erro
