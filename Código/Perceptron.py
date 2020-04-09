@@ -42,11 +42,14 @@ def tanhOp(x):
         
 class Perceptron:
     
-    def __init__(self, numInputs, taxaAprendizado, bias = None):
+    def __init__(self, numInputs, taxaAprendizado, bias = None, semente = None):
     
         self.numInputs = numInputs
         self.taxa = taxaAprendizado
         self.pesos = []
+        
+        if(semente):
+            random.seed(semente)
         
         if bias:
             self.bias = bias
@@ -65,12 +68,11 @@ class Perceptron:
         x =  (soma + self.bias)
         if(x == 0):
             return 1
-        return  tanhOp(x)#np.sign(x)
+        return  np.sign(x)
         
     def treinar(self, erro, inputs):
             
         for i in range(self.numInputs):
             self.pesos[i]  =  self.pesos[i] + (self.taxa*erro*inputs[i])
-            print((self.taxa*erro*inputs[i]))
             
         self.bias = self.bias + self.taxa*erro

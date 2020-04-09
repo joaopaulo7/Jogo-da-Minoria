@@ -29,20 +29,15 @@ from Perceptron import Perceptron
 import random, math, os
 from xlwt import Workbook 
 
-def plotar(vum, vzero, tam, eta):
+def plotar(x, y, legenda = "linha1", xt = "x", yt ="y", titulo = "") :
     
-    v1=[]
+    plt.plot(x, y, label = legenda) 
     
-    for i in range(tam):
-        v1.append( abs(vum[i] - vzero[i]))
-    plt.plot(range(tam), v1, label = ""+str(eta)+" eta") 
-    
-    
-    plt.xlabel('jogada') 
+    plt.xlabel(xt) 
      
-    plt.ylabel('diferença') 
+    plt.ylabel(yt) 
     
-    plt.title('diferença entre a quantidade de zeros e uns em cada jogada') 
+    plt.title(titulo) 
       
     plt.legend() 
 
@@ -69,17 +64,21 @@ class Jogador:
     def addVitorias(self, i, num = 1):
         self.vitorias += num
         
-def main(args):
+def teste(args, semente = None):
     
     numJogadores = 101
-    numJogadas = 20000
+    numJogadas = 1000
     
     memoria =  [0,0,0,0,0,0,0,0,0,0,0,0,0]
     jogadores = []
-        
+    
+    vuns = []
+    vzeros  = []
+    somaTotal = 0
+    random.seed(semente)
     for i in range(numJogadores):
         nome = "PerceptronSimples-" + str(i)
-        p = Perceptron(numInputs = 13, taxaAprendizado = args)
+        p = Perceptron(numInputs = 13, taxaAprendizado = args, semente = random.randint(0, 10000))
         jogador = Jogador(nome, p)
         jogadores.append(jogador)
 
@@ -94,10 +93,7 @@ def main(args):
     sheet1.write(0, 3, "Soma")
     sheet1.write(0, 4, "Diferença")
     #[fim] planilha
-
-    vuns = []
-    vzeros  = []
-
+    
     for i in range(numJogadas):
         soma = 0
         jogadas = []
@@ -110,10 +106,10 @@ def main(args):
         minoria = -np.sign(soma)
         
         for j in range(numJogadores):
-            if jogadas[j] == minoria :
+            if jogadas[j] == minoria:
                 jogadores[j].addVitorias(i)
             else:
-                jogadores[j].treinar( -soma/101, memoria[-13:])
+                jogadores[j].treinar( minoria, memoria[-13:])
         
         if(minoria < 0):
             vuns.append(abs(math.floor(soma/2) - (numJogadores - 1)/2))
@@ -122,6 +118,7 @@ def main(args):
             vuns.append(abs(math.ceil(soma/2) - ((numJogadores - 1)/2) - 1))
             vzeros.append(abs(math.ceil(soma/2) + ((numJogadores - 1)/2)))
         
+        
         #Usado para planilha
         sheet1.write(i+1, 1, vuns[i])
         sheet1.write(i+1, 2, vzeros[i])
@@ -129,18 +126,27 @@ def main(args):
         sheet1.write(i+1, 4, int(abs(soma)))
         #[fim] planilha
         
-        memoria.append( -soma/101)
+        memoria.append( minoria)
         
-        os.system('clear')
+        somaTotal = somaTotal + abs(soma)
+        print(soma)
+        
+        #os.system('clear')
     
     #salva a planilha
     wb.save('resultados/'+str(numJogadas)+' - 101jogadores - 13inpts - '+str(args)+'eta - 02.ods')
-    
-    #plota e salva o grafico
-    plotar(vuns, vzeros,numJogadas, args)
+    return somaTotal/1000
 
+#FIM DAS FUNÇOES
 
+v = []
+x = []
+seed = random.randint(0, 100);
+for i in range (200):
+    x.append( round(1/math.pow((i*0.1 + 1), 2), 4))
+    v.append(teste(x[i], seed))
+    print(x)
 
-for i in range (3):
-    main(round(1/math.pow((i + 8), 2), 3))
-plt.savefig('../Gráficos/gráfico - Zeros e Uns - variaçao de eta- 03 - 10000.png') 
+plotar(x, v, legenda = " media da diferença", xt = "eta", yt = "diferença", titulo = " media diferença de uns e zeros com cada ETA")
+
+plt.savefig('../Gráficos/gráfico - Zeros e Uns - variaçao de eta- 03 - media por eta.png', dpi=600) 
