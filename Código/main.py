@@ -67,14 +67,14 @@ class Jogador:
 def teste(args, semente = None):
     
     numJogadores = 101
-    numJogadas = 1000
+    numJogadas = 10000
     
     memoria =  [0,0,0,0,0,0,0,0,0,0,0,0,0]
     jogadores = []
     
     vuns = []
     vzeros  = []
-    somaTotal = 0
+    somaTotal = []
     random.seed(semente)
     for i in range(numJogadores):
         nome = "PerceptronSimples-" + str(i)
@@ -128,25 +128,25 @@ def teste(args, semente = None):
         
         memoria.append( minoria)
         
-        somaTotal = somaTotal + abs(soma)
+        somaTotal.append(abs(soma))
         print(soma)
         
         #os.system('clear')
     
     #salva a planilha
     wb.save('resultados/'+str(numJogadas)+' - 101jogadores - 13inpts - '+str(args)+'eta - 02.ods')
-    return somaTotal/1000
+    return somaTotal
 
 #FIM DAS FUNÇOES
 
 v = []
 x = []
 seed = random.randint(0, 100);
-for i in range (200):
+for i in range (0):
     x.append( round(1/math.pow((i*0.1 + 1), 2), 4))
     v.append(teste(x[i], seed))
     print(x)
 
-plotar(x, v, legenda = " media da diferença", xt = "eta", yt = "diferença", titulo = " media diferença de uns e zeros com cada ETA")
+plotar(range(10000), teste(0.001, seed), legenda = " media da diferença", xt = "eta", yt = "diferença", titulo = " media diferença de uns e zeros com cada ETA")
 
 plt.savefig('../Gráficos/gráfico - Zeros e Uns - variaçao de eta- 03 - media por eta.png', dpi=600) 

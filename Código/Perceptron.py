@@ -54,11 +54,12 @@ class Perceptron:
         if bias:
             self.bias = bias
         else:
-            self.bias = random.random()*2-1
+            self.bias = round(random.random()*2-1, 3)
+            print(self.bias)
         
         
         for i in range(numInputs):
-            self.pesos.append(random.random()*2-1)
+            self.pesos.append(round(random.random()*2-1, 3))
         
     def ativar(self, inputs):
         
