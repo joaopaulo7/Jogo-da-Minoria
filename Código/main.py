@@ -78,7 +78,7 @@ def teste(args, semente = None):
     random.seed(semente)
     for i in range(numJogadores):
         nome = "PerceptronSimples-" + str(i)
-        p = Perceptron(numInputs = 13, taxaAprendizado = args, semente = random.randint(0, 10000))
+        p = Perceptron(numInputs = 13, taxaAprendizado = args, semente = random.randint(0, 1000))
         jogador = Jogador(nome, p)
         jogadores.append(jogador)
 
